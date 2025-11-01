@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nhắc nhở hàng ngày</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .app-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        h1 {
+            color: #4CAF50;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .reminder-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 25px 0;
+        }
+        .reminder-box h2 {
+            margin: 0 0 10px 0;
+            font-size: 22px;
+        }
+        .reminder-box p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .tips {
+            background-color: #f0f8ff;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .tip-item {
+            margin: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        .tip-item:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">💡</div>
+            <div class="app-name">Finance App</div>
+        </div>
+        
+        <h1>Nhắc nhở ghi giao dịch</h1>
+        
+        <p>Chào <strong th:text="${fullName}">User</strong>,</p>
+        
+        <div class="reminder-box">
+            <h2>Đừng quên ghi lại giao dịch hôm nay! ✨</h2>
+            <p>Việc ghi chép đều đặn sẽ giúp bạn quản lý tài chính tốt hơn</p>
+        </div>
+        
+        <p>Chúng tôi nhận thấy bạn chưa ghi giao dịch nào trong ngày hôm nay. Hãy dành vài phút để cập nhật:</p>
+        
+        <div class="tips">
+            <h3 style="margin-top: 0; color: #4CAF50;">Mẹo ghi chép hiệu quả:</h3>
+            <div class="tip-item">Ghi ngay khi chi tiêu, đừng để quên</div>
+            <div class="tip-item">Đính kèm hóa đơn để dễ kiểm tra sau</div>
+            <div class="tip-item">Sử dụng tính năng giao dịch nhanh để tiết kiệm thời gian</div>
+            <div class="tip-item">AI sẽ gợi ý danh mục phù hợp cho bạn</div>
+        </div>
+        
+        <p style="text-align: center; font-size: 18px; margin: 25px 0;">
+            📊 <strong>Thống kê:</strong> Người dùng ghi chép đều đặn tiết kiệm được <strong>25% chi tiêu</strong> mỗi tháng!
+        </p>
+        
+        <div style="text-align: center;">
+            <a th:href="${transactionsUrl}" class="button">Ghi giao dịch ngay</a>
+        </div>
+        
+        <div class="footer">
+            <p>Email nhắc nhở này được gửi vào 9h tối hàng ngày.</p>
+            <p>Bạn có thể tắt nhắc nhở trong phần cài đặt.</p>
+            <p>&copy; 2025 Finance App. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
+

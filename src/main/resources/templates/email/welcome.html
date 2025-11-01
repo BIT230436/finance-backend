@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chào mừng</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .app-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #4CAF50;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .features {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .feature-item {
+            margin: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        .feature-item:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🎉</div>
+            <div class="app-name">Finance App</div>
+        </div>
+        
+        <h1>Chào mừng bạn!</h1>
+        
+        <p>Xin chào <strong th:text="${fullName}">User</strong>,</p>
+        
+        <p>Chúc mừng bạn đã đăng ký thành công tài khoản Finance App! Chúng tôi rất vui khi bạn tham gia cộng đồng quản lý tài chính thông minh.</p>
+        
+        <div class="features">
+            <h3 style="margin-top: 0; color: #4CAF50;">Những gì bạn có thể làm:</h3>
+            <div class="feature-item">Quản lý nhiều ví tiền (Tiền mặt, Ngân hàng, Ví điện tử)</div>
+            <div class="feature-item">Theo dõi thu chi tự động với AI gợi ý</div>
+            <div class="feature-item">Đặt ngân sách và nhận cảnh báo thông minh</div>
+            <div class="feature-item">Xem báo cáo và biểu đồ chi tiết</div>
+            <div class="feature-item">Chia sẻ ví với gia đình</div>
+            <div class="feature-item">Đặt mục tiêu tiết kiệm và theo dõi tiến độ</div>
+        </div>
+        
+        <p>Hệ thống đã tự động tạo sẵn cho bạn:</p>
+        <ul>
+            <li>✓ 15 danh mục thu chi mặc định</li>
+            <li>✓ 1 ví tiền mặt sẵn sàng sử dụng</li>
+        </ul>
+        
+        <div style="text-align: center;">
+            <a th:href="${loginUrl}" class="button">Bắt đầu sử dụng ngay</a>
+        </div>
+        
+        <p style="margin-top: 30px; color: #666;">
+            <strong>💡 Mẹo nhỏ:</strong> Hãy bắt đầu bằng cách ghi lại vài giao dịch đầu tiên. 
+            Càng ghi nhiều, hệ thống AI sẽ càng hiểu và gợi ý chính xác hơn!
+        </p>
+        
+        <div class="footer">
+            <p>Nếu bạn cần hỗ trợ, đừng ngần ngại liên hệ với chúng tôi.</p>
+            <p>&copy; 2025 Finance App. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
+

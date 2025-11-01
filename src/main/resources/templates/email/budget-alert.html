@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cảnh báo ngân sách</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .app-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+        h1 {
+            color: #ff6b6b;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .alert-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ff6b6b;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background-color: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #ff6b6b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 0.3s ease;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #ff6b6b;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">⚠️</div>
+            <div class="app-name">Cảnh báo ngân sách</div>
+        </div>
+        
+        <h1>Ngân sách "<span th:text="${categoryName}">Category</span>" cần chú ý!</h1>
+        
+        <p>Xin chào <strong th:text="${fullName}">User</strong>,</p>
+        
+        <div class="alert-box">
+            <p style="margin: 0; font-size: 16px;">
+                Ngân sách của bạn đã sử dụng <strong th:text="${percentageUsed} + '%'">80%</strong> hạn mức!
+            </p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" th:style="'width: ' + ${percentageUsed} + '%'">
+                <span th:text="${percentageUsed} + '%'">80%</span>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" th:text="${usedAmount}">800,000</div>
+                <div class="stat-label">Đã sử dụng</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" th:text="${limitAmount}">1,000,000</div>
+                <div class="stat-label">Hạn mức</div>
+            </div>
+        </div>
+        
+        <p><strong>💡 Gợi ý:</strong></p>
+        <ul>
+            <li>Xem lại các giao dịch gần đây trong danh mục này</li>
+            <li>Cân nhắc giảm chi tiêu không cần thiết</li>
+            <li>Kiểm tra xem có giao dịch nào bị ghi nhầm không</li>
+        </ul>
+        
+        <div style="text-align: center;">
+            <a th:href="${dashboardUrl}" class="button">Xem chi tiết ngân sách</a>
+        </div>
+        
+        <div class="footer">
+            <p>Bạn nhận được email này vì đã bật tính năng cảnh báo ngân sách.</p>
+            <p>&copy; 2025 Finance App. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>
+
