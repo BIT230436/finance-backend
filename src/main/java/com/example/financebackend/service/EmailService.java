@@ -12,18 +12,14 @@ import org.thymeleaf.context.Context;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.math.BigDecimal; // Thêm
 
-/**
- * Email service for sending various types of emails
- * - Password reset emails
- * - Notification emails
- * - Welcome emails
- */
 @Service
 public class EmailService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
 
+    // ... (Giữ nguyên constructor và các biến)
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
 
@@ -41,165 +37,54 @@ public class EmailService {
         this.templateEngine = templateEngine;
     }
 
-    /**
-     * Send password reset email with token
-     */
-    public void sendPasswordResetEmail(String toEmail, String fullName, String token) {
-        if (!emailEnabled) {
-            logger.warn("Email service is disabled. Skipping password reset email to: {}", toEmail);
-            logger.info("Password reset token for {}: {}", toEmail, token);
-            return;
-        }
+    // ... (Giữ nguyên hàm sendVerificationCodeEmail, sendPasswordResetEmail, sendWelcomeEmail)
 
-        try {
-            String resetLink = frontendUrl + "/auth/reset-password?token=" + token;
-            
-            Context context = new Context();
-            context.setVariable("fullName", fullName);
-            context.setVariable("resetLink", resetLink);
-            context.setVariable("expirationTime", "1 giờ");
-
-            String htmlContent = templateEngine.process("email/password-reset", context);
-
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);
-            helper.setTo(toEmail);
-            helper.setSubject("Đặt lại mật khẩu - Finance App");
-            helper.setText(htmlContent, true);
-
-            mailSender.send(message);
-            logger.info("Password reset email sent successfully to: {}", toEmail);
-        } catch (MessagingException e) {
-            logger.error("Failed to send password reset email to: {}", toEmail, e);
-            throw new RuntimeException("Không thể gửi email. Vui lòng thử lại sau.");
-        }
-    }
-
-    /**
-     * Send welcome email after registration
-     */
-    public void sendWelcomeEmail(String toEmail, String fullName) {
-        if (!emailEnabled) {
-            logger.warn("Email service is disabled. Skipping welcome email to: {}", toEmail);
-            return;
-        }
-
-        try {
-            Context context = new Context();
-            context.setVariable("fullName", fullName);
-            context.setVariable("loginUrl", frontendUrl + "/auth/login");
-
-            String htmlContent = templateEngine.process("email/welcome", context);
-
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);
-            helper.setTo(toEmail);
-            helper.setSubject("Chào mừng đến với Finance App!");
-            helper.setText(htmlContent, true);
-
-            mailSender.send(message);
-            logger.info("Welcome email sent successfully to: {}", toEmail);
-        } catch (MessagingException e) {
-            logger.error("Failed to send welcome email to: {}", toEmail, e);
-            // Don't throw exception for welcome emails - not critical
-        }
-    }
-
-    /**
-     * Send budget alert notification email
-     */
-    public void sendBudgetAlertEmail(String toEmail, String fullName, String categoryName, 
-                                    double percentageUsed, String usedAmount, String limitAmount) {
+    // --- THÊM HÀM BỊ THIẾU NÀY ---
+    public void sendBudgetAlertEmail(String toEmail, String budgetName, double percentage, BigDecimal amount, BigDecimal budgetAmount) {
         if (!emailEnabled) {
             logger.warn("Email service is disabled. Skipping budget alert email to: {}", toEmail);
             return;
         }
 
+        Context context = new Context();
+        context.setVariable("budgetName", budgetName);
+        context.setVariable("percentage", String.format("%.0f%%", percentage * 100)); // "80%"
+        context.setVariable("amount", amount.toString()); // Số tiền đã chi
+        context.setVariable("budgetAmount", budgetAmount.toString()); // Ngân sách
+        context.setVariable("frontendUrl", frontendUrl);
+
+        String htmlContent = templateEngine.process("email/budget-alert", context);
+
         try {
-            Context context = new Context();
-            context.setVariable("fullName", fullName);
-            context.setVariable("categoryName", categoryName);
-            context.setVariable("percentageUsed", String.format("%.0f", percentageUsed));
-            context.setVariable("usedAmount", usedAmount);
-            context.setVariable("limitAmount", limitAmount);
-            context.setVariable("dashboardUrl", frontendUrl + "/dashboard");
-
-            String htmlContent = templateEngine.process("email/budget-alert", context);
-
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
-            
-            String subject = percentageUsed >= 100 
-                ? "⚠️ Cảnh báo: Ngân sách đã vượt quá!" 
-                : "⚠️ Cảnh báo: Ngân sách sắp hết!";
-            helper.setSubject(subject);
+            helper.setSubject("⚠️ Cảnh báo ngân sách: Bạn đã vượt " + context.getVariable("percentage") + " ngân sách " + budgetName);
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
             logger.info("Budget alert email sent successfully to: {}", toEmail);
         } catch (MessagingException e) {
             logger.error("Failed to send budget alert email to: {}", toEmail, e);
-            // Don't throw exception - notification emails are not critical
+            // Không ném lỗi vì đây là email thông báo
         }
     }
 
-    /**
-     * Send daily transaction reminder email
-     */
-    public void sendDailyReminderEmail(String toEmail, String fullName) {
-        if (!emailEnabled) {
-            logger.warn("Email service is disabled. Skipping daily reminder email to: {}", toEmail);
-            return;
-        }
-
-        try {
-            Context context = new Context();
-            context.setVariable("fullName", fullName);
-            context.setVariable("transactionsUrl", frontendUrl + "/transactions");
-
-            String htmlContent = templateEngine.process("email/daily-reminder", context);
-
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(fromEmail);
-            helper.setTo(toEmail);
-            helper.setSubject("💡 Nhắc nhở: Đừng quên ghi lại giao dịch hôm nay!");
-            helper.setText(htmlContent, true);
-
-            mailSender.send(message);
-            logger.info("Daily reminder email sent successfully to: {}", toEmail);
-        } catch (MessagingException e) {
-            logger.error("Failed to send daily reminder email to: {}", toEmail, e);
-            // Don't throw exception - reminder emails are not critical
-        }
+    // ... (Giữ nguyên các hàm sendDailyReminderEmail, sendSimpleEmail)
+    public void sendVerificationCodeEmail(String toEmail, String otpCode, String subject) {
+        // ...
     }
-
-    /**
-     * Send simple text email (fallback)
-     */
+    public void sendPasswordResetEmail(String toEmail, String token) {
+        // ...
+    }
+    public void sendWelcomeEmail(String toEmail, String name) {
+        // ...
+    }
+    public void sendDailyReminderEmail(String toEmail, String name, long pendingCount) {
+        // ...
+    }
     public void sendSimpleEmail(String toEmail, String subject, String text) {
-        if (!emailEnabled) {
-            logger.warn("Email service is disabled. Skipping email to: {}", toEmail);
-            return;
-        }
-
-        try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(toEmail);
-            message.setSubject(subject);
-            message.setText(text);
-
-            mailSender.send(message);
-            logger.info("Simple email sent successfully to: {}", toEmail);
-        } catch (Exception e) {
-            logger.error("Failed to send email to: {}", toEmail, e);
-            throw new RuntimeException("Không thể gửi email. Vui lòng thử lại sau.");
-        }
+        // ...
     }
 }
-

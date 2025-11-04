@@ -1,109 +1,105 @@
 package com.example.financebackend.controller;
 
-import com.example.financebackend.dto.AuditLogDto;
 import com.example.financebackend.dto.ChangePasswordRequest;
 import com.example.financebackend.dto.DeleteAccountRequest;
 import com.example.financebackend.dto.UpdateProfileRequest;
-import com.example.financebackend.dto.UserDto;
 import com.example.financebackend.dto.UserPreferencesDto;
-import com.example.financebackend.entity.AuditLog;
-import com.example.financebackend.service.AuthService;
-import com.example.financebackend.service.AuditLogService;
+import com.example.financebackend.dto.UserDto;
+// THÊM IMPORT NÀY
 import com.example.financebackend.util.AuthUtil;
+// TẠO SERVICE MỚI
+
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/profile")
 public class UserProfileController {
 
-    private final AuthService authService;
-    private final AuditLogService auditLogService;
+    // SỬ DỤNG SERVICE MỚI
+    private final UserProfileService userProfileService;
 
-    public UserProfileController(AuthService authService, AuditLogService auditLogService) {
-        this.authService = authService;
-        this.auditLogService = auditLogService;
+    public UserProfileController(UserProfileService userProfileService) {
+        this.userProfileService = userProfileService;
     }
 
-    @GetMapping("/profile")
-    public UserDto getProfile() {
-        Long userId = AuthUtil.getCurrentUserId();
-        return authService.getProfile(userId);
+    @GetMapping
+    public ResponseEntity<UserDto> getProfile() {
+        // SỬA LOGIC: Lấy userId từ context
+        try {
+            Long userId = AuthUtil.getCurrentUserId();
+            UserDto userDto = userProfileService.getProfile(userId);
+            return ResponseEntity.ok(userDto);
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
-    @PutMapping("/profile")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public UserDto updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
-        Long userId = AuthUtil.getCurrentUserId();
-        return authService.updateProfile(userId, request);
+    @PutMapping
+    public ResponseEntity<UserDto> updateProfile(@Valid @RequestBody UpdateProfileRequest request) {
+        // SỬA LOGIC: Lấy userId từ context
+        try {
+            Long userId = AuthUtil.getCurrentUserId();
+            UserDto updatedUser = userProfileService.updateProfile(userId, request);
+            return ResponseEntity.ok(updatedUser);
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
-    @PutMapping("/change-password")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public void changePassword(@Valid @RequestBody ChangePasswordRequest request) {
-        Long userId = AuthUtil.getCurrentUserId();
-        authService.changePassword(userId, request);
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        // SỬA LOGIC: Lấy userId từ context
+        try {
+            Long userId = AuthUtil.getCurrentUserId();
+            userProfileService.changePassword(userId, request);
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (BadCredentialsException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @GetMapping("/preferences")
-    public UserPreferencesDto getPreferences() {
-        Long userId = AuthUtil.getCurrentUserId();
-        return authService.getPreferences(userId);
+    public ResponseEntity<UserPreferencesDto> getPreferences() {
+        // SỬA LOGIC: Lấy userId từ context
+        try {
+            Long userId = AuthUtil.getCurrentUserId();
+            UserPreferencesDto preferences = userProfileService.getPreferences(userId);
+            return ResponseEntity.ok(preferences);
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
     @PutMapping("/preferences")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public UserPreferencesDto updatePreferences(@Valid @RequestBody UserPreferencesDto dto) {
-        Long userId = AuthUtil.getCurrentUserId();
-        return authService.updatePreferences(userId, dto);
+    public ResponseEntity<UserPreferencesDto> updatePreferences(@Valid @RequestBody UserPreferencesDto preferences) {
+        // SỬA LOGIC: Lấy userId từ context
+        try {
+            Long userId = AuthUtil.getCurrentUserId();
+            UserPreferencesDto updatedPreferences = userProfileService.updatePreferences(userId, preferences);
+            return ResponseEntity.ok(updatedPreferences);
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        }
     }
 
-    /**
-     * Delete user account permanently
-     * Requires password confirmation
-     */
-    @DeleteMapping("/account")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<Map<String, Object>> deleteAccount(@Valid @RequestBody DeleteAccountRequest request) {
-        Long userId = AuthUtil.getCurrentUserId();
-        authService.deleteAccount(userId, request.getPassword());
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "Tài khoản đã được xóa thành công");
-        
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/login-history")
-    public Page<AuditLogDto> getLoginHistory(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        Long userId = AuthUtil.getCurrentUserId();
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        // Filter by LOGIN action only
-        Page<AuditLogDto> allLogs = auditLogService.getUserLogs(userId, pageable);
-        // Filter to only LOGIN actions
-        return new org.springframework.data.domain.PageImpl<>(
-                allLogs.getContent().stream()
-                        .filter(log -> log.getAction() == AuditLog.Action.LOGIN)
-                        .collect(java.util.stream.Collectors.toList()),
-                pageable,
-                allLogs.getContent().stream()
-                        .filter(log -> log.getAction() == AuditLog.Action.LOGIN)
-                        .count()
-        );
+    @PostMapping("/delete-account")
+    public ResponseEntity<Void> deleteAccount(@Valid @RequestBody DeleteAccountRequest request) {
+        // SỬA LOGIC: Lấy userId từ context
+        try {
+            Long userId = AuthUtil.getCurrentUserId();
+            userProfileService.deleteAccount(userId, request.getPassword());
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (BadCredentialsException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 }
-

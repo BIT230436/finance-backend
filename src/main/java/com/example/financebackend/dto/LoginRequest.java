@@ -1,23 +1,18 @@
 package com.example.financebackend.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-
 public class LoginRequest {
-
-    @NotBlank(message = "Email là bắt buộc")
-    @Email(message = "Email không hợp lệ")
     private String email;
-
-    @NotBlank(message = "Mật khẩu là bắt buộc")
     private String password;
+    private String totpCode; // Mã 2FA (nếu có)
+    private String captchaToken; // Thêm trường này
 
+    // Getters and Setters
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
-        this.email = email != null ? email.toLowerCase().trim() : null;
+        this.email = email;
     }
 
     public String getPassword() {
@@ -26,5 +21,22 @@ public class LoginRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getTotpCode() {
+        return totpCode;
+    }
+
+    public void setTotpCode(String totpCode) {
+        this.totpCode = totpCode;
+    }
+
+    // Thêm getter và setter cho captchaToken
+    public String getCaptchaToken() {
+        return captchaToken;
+    }
+
+    public void setCaptchaToken(String captchaToken) {
+        this.captchaToken = captchaToken;
     }
 }
